@@ -15,21 +15,30 @@ class Create_Rectangular_Polygons ( pcbnew.ActionPlugin ):
                 
                 self.perform_changes = False
                 self.netz = 0
+                self.layer = 3
                 self.clearance = 0.2
                 self.distance = 0.5
                 self.min_thickness = 0.175
                 self.thermal_gap = 0.3
 
                 self.panel = wx.Panel(self) 
-                vbox = wx.GridSizer(6, 2, 0, 0) 
+                vbox = wx.GridSizer(7, 2, 0, 0) 
                 
                 l1 = wx.StaticText(self.panel, -1, "Connect to net:") 
                 vbox.Add(l1, 1, wx.ALIGN_RIGHT|wx.ALL,5) 
                 netList = [str(k) for k in pcbnew.GetBoard().GetNetsByName().keys()]           
                 self.t1 = wx.ComboBox(self.panel, choices=netList)
                 self.t1.SetSelection(0)                                
-                self.t1.Bind(wx.EVT_COMBOBOX, self.onCombo)
+                self.t1.Bind(wx.EVT_COMBOBOX, self.OnNet)
                 vbox.Add(self.t1,1,wx.EXPAND|wx.ALIGN_LEFT|wx.ALL,5)
+                
+                l6 = wx.StaticText(self.panel, -1, "On PCB-Copper-Layer(s):") 
+                vbox.Add(l6, 1, wx.ALIGN_RIGHT|wx.ALL,5) 
+                layerList = ['Top and Bottom', 'Top', 'Bottom']           
+                self.t6 = wx.ComboBox(self.panel, choices=layerList)
+                self.t6.SetSelection(0)                                
+                self.t6.Bind(wx.EVT_COMBOBOX, self.OnLayer)
+                vbox.Add(self.t6,1,wx.EXPAND|wx.ALIGN_LEFT|wx.ALL,5)
 
                 l2 = wx.StaticText(self.panel, -1, "Clearance (mm):") 
                 vbox.Add(l2, 1, wx.ALIGN_RIGHT|wx.ALL,5) 
@@ -74,8 +83,11 @@ class Create_Rectangular_Polygons ( pcbnew.ActionPlugin ):
                 self.Fit()  
 
             #----------------------------------------------------------------------
-            def onCombo(self, event):
+            def OnNet(self, event):
                 self.netz = pcbnew.GetBoard().GetNetsByName().find(self.t1.GetValue()).value()[1].GetNet()
+            
+            def OnLayer(self, event):
+                self.layer = 3 - self.t6.GetSelection()
                 
             def OnKeyTyped2(self, event): 
                 self.clearance = self.retanum(event.GetString(), 0.2)
@@ -120,6 +132,12 @@ class Create_Rectangular_Polygons ( pcbnew.ActionPlugin ):
         min_thickness = frame.min_thickness
         thermal_gap = frame.thermal_gap
         
+        laylst = []
+        if (frame.layer & 1):
+            laylst.append(pcbnew.B_Cu)
+        if (frame.layer & 2):
+            laylst.append(pcbnew.F_Cu)
+        
         
         if frame.perform_changes:       
             min_x = None
@@ -156,7 +174,7 @@ class Create_Rectangular_Polygons ( pcbnew.ActionPlugin ):
             poly_min_y = (min_y + pcbnew.FromMM(distance))
             poly_max_y = (max_y - pcbnew.FromMM(distance))
 
-            for layer in [pcbnew.F_Cu, pcbnew.B_Cu]:
+            for layer in laylst:
                 poly = pcb.InsertArea(netz, 0, layer, poly_min_x, poly_min_y, pcbnew.CPolyLine.DIAGONAL_EDGE)
                 poly.SetZoneClearance(pcbnew.FromMM(clearance))
                 poly.SetMinThickness(pcbnew.FromMM(min_thickness))
