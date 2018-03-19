@@ -63,7 +63,8 @@ class Create_Output( pcbnew.ActionPlugin ):
         popt.SetUseGerberAttributes(True)
         popt.SetExcludeEdgeLayer(False);
         popt.SetScale(1)
-        popt.SetUseAuxOrigin(True)
+        popt.SetUseAuxOrigin(False)
+        popt.SetDrillMarksType(pcbnew.PCB_PLOT_PARAMS.NO_DRILL_SHAPE)
 
         popt.SetOutputDirectory(fabdir)
 
@@ -153,7 +154,8 @@ class Create_Output( pcbnew.ActionPlugin ):
         #######################################################################################################
 
         popt.SetA4Output(True)
-        popt.SetAutoScale(True)
+        popt.SetLineWidth(pcbnew.FromMM(0.25))
+        # popt.SetAutoScale(True)
         
         # Switching the output directory
         popt.SetOutputDirectory(dokudir)
@@ -166,17 +168,7 @@ class Create_Output( pcbnew.ActionPlugin ):
         popt.SetSubtractMaskFromSilk(False)
         popt.SetPlotReference(True)
         popt.SetPlotValue(False)
-        popt.SetPlotInvisibleText(True)
-
-        pctl.SetLayer(pcbnew.F_SilkS)
-        pctl.OpenPlotfile("AssyTop", pcbnew.PLOT_FORMAT_PDF, "Assembly top")
-        pctl.PlotLayer()
-
-        ## For documentation we also want a general layout PDF
-        ## I usually use a shell script to merge the ps files and then distill the result
-        ## Now I can do it with a control file. As a bonus I can have references in a
-        ## different colour, too.
-
+        popt.SetPlotInvisibleText(False)
         popt.SetPlotReference(True)
         popt.SetPlotValue(True)
         popt.SetPlotInvisibleText(False)
@@ -184,40 +176,28 @@ class Create_Output( pcbnew.ActionPlugin ):
         # Remember that the frame is always in color 0 (BLACK) and should be requested
         # before opening the plot
         popt.SetPlotFrameRef(False)
-        popt.SetDrillMarksType(pcbnew.PCB_PLOT_PARAMS.SMALL_DRILL_SHAPE)
+        popt.SetPlotPadsOnSilkLayer(True)
+        
+        popt.SetFineScaleAdjustX(1.000)
+        popt.SetFineScaleAdjustY(1.000)       
         
         pctl.OpenPlotfile("Layout", pcbnew.PLOT_FORMAT_PDF, "General layout")
-        popt.SetTextMode(pcbnew.PLOTTEXTMODE_NATIVE)
-        # pctl.SetColorMode(True)
-        
-        #pctl.SetLayer(pcbnew.Dwgs_User)
-        #pctl.PlotLayer()
+        popt.SetTextMode(pcbnew.PLOTTEXTMODE_STROKE)
 
-        # Do the PCB edges in yellow
         pctl.SetLayer(pcbnew.Edge_Cuts)
         pctl.PlotLayer()
 
-        ## Comments in, uhmm... green
-        #pctl.SetLayer(pcbnew.Cmts_User)
-        #pctl.PlotLayer()
-
-        # Bottom mask as lines only, in red
-        pctl.SetLayer(pcbnew.B_Mask)
-        pctl.PlotLayer()
-
-        # Top mask as lines only, in blue
+        popt.SetPlotMode(pcbnew.NO_FILL)     
         pctl.SetLayer(pcbnew.F_Mask)
         pctl.PlotLayer()
 
-        # Top paste in light blue, filled
-        #pctl.SetLayer(pcbnew.F_Paste)
-        #pctl.PlotLayer()
-
-        # Top Silk
+        popt.SetPlotMode(pcbnew.FILLED_SHAPE)
         pctl.SetLayer(pcbnew.F_SilkS)
         pctl.PlotLayer()
         
         pctl.ClosePlot()
+        
+        ################################################################################################################
         
         pctl.OpenPlotfile("Assembly", pcbnew.PLOT_FORMAT_SVG, "Master Assembly")
         pctl.SetColorMode(True)
@@ -266,3 +246,7 @@ class Create_Output( pcbnew.ActionPlugin ):
         # At the end you have to close the last plot, otherwise you don't know when
         # the object will be recycled!
         pctl.ClosePlot()
+        
+        
+if __name__ == "__main__":
+    Create_Output().Run()
