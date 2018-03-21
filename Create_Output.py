@@ -50,19 +50,19 @@ class Create_Output( pcbnew.ActionPlugin ):
             os.mkdir(mapfiledir)
 
         pctl = pcbnew.PLOT_CONTROLLER(board)
-
         popt = pctl.GetPlotOptions()
 
         # Set some important plot options:
         popt.SetPlotFrameRef(False)
-        popt.SetLineWidth(pcbnew.FromMM(0.1))
+        popt.SetLineWidth(pcbnew.FromMM(0.05))
 
         popt.SetAutoScale(False)
         popt.SetScale(1)
         popt.SetMirror(False)
         popt.SetUseGerberAttributes(True)
-        popt.SetExcludeEdgeLayer(False);
-        popt.SetScale(1)
+        popt.SetGerberPrecision(6)
+        popt.SetExcludeEdgeLayer(True)
+        popt.SetSubtractMaskFromSilk(True)
         popt.SetUseAuxOrigin(False)
         popt.SetDrillMarksType(pcbnew.PCB_PLOT_PARAMS.NO_DRILL_SHAPE)
 
@@ -76,21 +76,22 @@ class Create_Output( pcbnew.ActionPlugin ):
         rename_necessary = False
 
         plot_plan = [
-            ( "CuTop", pcbnew.F_Cu, "Top layer" ),
-            ( "CuBottom", pcbnew.B_Cu, "Bottom layer" ),
+            ( "TopLayer", pcbnew.F_Cu, "Top layer" ),
+            ( "BottomLayer", pcbnew.B_Cu, "Bottom layer" ),
             ( "PasteBottom", pcbnew.B_Paste, "Paste Bottom" ),
             ( "PasteTop", pcbnew.F_Paste, "Paste top" ),
             ( "SilkTop", pcbnew.F_SilkS, "Silk top" ),
             ( "SilkBottom", pcbnew.B_SilkS, "Silk top" ),
             ( "MaskBottom", pcbnew.B_Mask, "Mask bottom" ),
             ( "MaskTop", pcbnew.F_Mask, "Mask top" ),
-            ( "EdgeCuts", pcbnew.Edge_Cuts, "Edges" ),
+            ( "Mechanical", pcbnew.Edge_Cuts, "Mechanical" ),
         ]
 
         popt.SetUseGerberProtelExtensions(True)
+        
         for layer_info in plot_plan:
             pctl.SetLayer(layer_info[1])
-            pctl.OpenPlotfile(layer_info[0], pcbnew.PLOT_FORMAT_GERBER, layer_info[2])
+            pctl.OpenPlotfile("", pcbnew.PLOT_FORMAT_GERBER, layer_info[2])
             filpn = pctl.GetPlotFileName().rsplit('.',1)[0:-1][0]
             extn = pctl.GetPlotFileName().rsplit('.', 1)[-1]
             pctl.PlotLayer()
@@ -154,7 +155,7 @@ class Create_Output( pcbnew.ActionPlugin ):
         #######################################################################################################
 
         popt.SetA4Output(True)
-        popt.SetLineWidth(pcbnew.FromMM(0.25))
+        popt.SetLineWidth(pcbnew.FromMM(0.1))
         # popt.SetAutoScale(True)
         
         # Switching the output directory
