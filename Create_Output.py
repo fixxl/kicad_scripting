@@ -134,7 +134,7 @@ class Create_Output( pcbnew.ActionPlugin ):
         drlwriter.SetOptions( mirror, minimalHeader, offset, mergeNPTH )
 
         metricFmt = True
-        drlwriter.SetFormat( metricFmt, pcbnew.GENDRILL_WRITER_BASE.SUPPRESS_LEADING )
+        drlwriter.SetFormat( metricFmt, pcbnew.GENDRILL_WRITER_BASE.SUPPRESS_LEADING, 3, 3 )
 
         drlwriter.CreateDrillandMapFilesSet( pctl.GetPlotDirName(), True, False );
         drlwriter.CreateDrillandMapFilesSet( mapfiledir , False, True );
