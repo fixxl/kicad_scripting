@@ -90,6 +90,10 @@ class Create_Output( pcbnew.ActionPlugin ):
         popt.SetUseGerberProtelExtensions(True)
         
         for layer_info in plot_plan:
+            if layer_info[1] <= pcbnew.B_Cu:
+                popt.SetSkipPlotNPTH_Pads( True )
+            else:
+                popt.SetSkipPlotNPTH_Pads( False )
             pctl.SetLayer(layer_info[1])
             pctl.OpenPlotfile("", pcbnew.PLOT_FORMAT_GERBER, layer_info[2])
             filpn = pctl.GetPlotFileName().rsplit('.',1)[0:-1][0]
@@ -206,7 +210,7 @@ class Create_Output( pcbnew.ActionPlugin ):
         # We want *everything*
         popt.SetPlotReference(True)
         popt.SetPlotValue(True)
-        popt.SetPlotInvisibleText(True)
+        popt.SetPlotInvisibleText(False)
 
         # Remember than the DXF driver assigns colours to layers. This means that
         # we will be able to turn references on and off simply using their layers
@@ -220,6 +224,7 @@ class Create_Output( pcbnew.ActionPlugin ):
         pctl.PlotLayer()
         pctl.SetLayer(pcbnew.F_SilkS)
         pctl.PlotLayer()
+        popt.SetDrillMarksType(pcbnew.PCB_PLOT_PARAMS.SMALL_DRILL_SHAPE)
         pctl.SetLayer(pcbnew.B_Mask)
         pctl.PlotLayer()
         pctl.SetLayer(pcbnew.F_Mask)
@@ -237,12 +242,12 @@ class Create_Output( pcbnew.ActionPlugin ):
         # and stuff in the cad. A pctl function to only plot them would be
         # better anyway...
 
-        popt.SetDrillMarksType(pcbnew.PCB_PLOT_PARAMS.FULL_DRILL_SHAPE)
-        pctl.SetLayer(pcbnew.B_Cu)
-        pctl.PlotLayer()
-        popt.SetDrillMarksType(pcbnew.PCB_PLOT_PARAMS.NO_DRILL_SHAPE)
-        pctl.SetLayer(pcbnew.F_Cu)
-        pctl.PlotLayer()
+        
+        #pctl.SetLayer(pcbnew.B_Cu)
+        #pctl.PlotLayer()
+        #popt.SetDrillMarksType(pcbnew.PCB_PLOT_PARAMS.NO_DRILL_SHAPE)
+        #pctl.SetLayer(pcbnew.F_Cu)
+        #pctl.PlotLayer()
 
         # At the end you have to close the last plot, otherwise you don't know when
         # the object will be recycled!
