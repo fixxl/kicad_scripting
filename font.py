@@ -97,11 +97,11 @@ class font( pcbnew.ActionPlugin ):
                 ang = m.Reference().GetTextAngle()
                 
                 for drawing in m.GraphicalItems():
-                    if isinstance(drawing,pcbnew.TEXTE_MODULE):
-                        drawing.SetTextWidth(pcbnew.FromMM(frame.tw))
-                        drawing.SetTextHeight(pcbnew.FromMM(frame.th))
-                        drawing.SetThickness(pcbnew.FromMM(frame.thick))  
-                        if (drawing.GetText()=="%R"):    
+                    if isinstance(drawing,pcbnew.TEXTE_MODULE): 
+                        if (drawing.GetText()=="%R"):
+                            drawing.SetTextWidth(pcbnew.FromMM(frame.tw))
+                            drawing.SetTextHeight(pcbnew.FromMM(frame.th))
+                            drawing.SetThickness(pcbnew.FromMM(frame.thick))                         
                             drawing.SetPosition(pos)
                             drawing.Rotate(pos, rot)
                             drawing.SetTextAngle(ang)
