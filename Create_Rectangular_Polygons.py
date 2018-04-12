@@ -180,6 +180,8 @@ class Create_Rectangular_Polygons ( pcbnew.ActionPlugin ):
                 poly.SetMinThickness(pcbnew.FromMM(min_thickness))
                 poly.SetThermalReliefGap(pcbnew.FromMM(thermal_gap))
                 poly.SetThermalReliefCopperBridge(pcbnew.FromMM(thermal_gap))
+                poly.SetArcSegmentCount(32)
+                poly.SetHV45(False)
                 poly.Outline().Append(poly_max_x, poly_min_y)
                 poly.Outline().Append(poly_max_x, poly_max_y)
                 poly.Outline().Append(poly_min_x, poly_max_y)
