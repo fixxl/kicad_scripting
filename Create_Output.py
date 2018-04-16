@@ -63,7 +63,7 @@ class Create_Output( pcbnew.ActionPlugin ):
         popt.SetGerberPrecision(6)
         popt.SetExcludeEdgeLayer(True)
         popt.SetSubtractMaskFromSilk(True)
-        popt.SetUseAuxOrigin(False)
+        popt.SetUseAuxOrigin(True)
         popt.SetDrillMarksType(pcbnew.PCB_PLOT_PARAMS.NO_DRILL_SHAPE)
 
         popt.SetOutputDirectory(fabdir)
@@ -132,7 +132,7 @@ class Create_Output( pcbnew.ActionPlugin ):
 
         mirror = False
         minimalHeader = False
-        offset = pcbnew.wxPoint(0,0)
+        offset = board.GetAuxOrigin()
         # False to generate 2 separate drill files (one for plated holes, one for non plated holes)
         # True to generate only one drill file
         mergeNPTH = False

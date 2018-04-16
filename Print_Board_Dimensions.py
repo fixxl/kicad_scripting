@@ -87,6 +87,8 @@ class Print_Board_Dimensions ( pcbnew.ActionPlugin ):
         
         if (addnew):
             pcb.Add(tt)
+            
+        pcb.SetAuxOrigin(pcbnew.wxPoint(min_x, min_y))
 
 if __name__ == "__main__":
     Print_Board_Dimensions().Run()
