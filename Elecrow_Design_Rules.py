@@ -20,7 +20,7 @@ class Elecrow_Design_Rules( pcbnew.ActionPlugin ):
         xx.SetClearance(200000)
         xx.SetTrackWidth(200000)
         xx.SetViaDrill(300000)
-        xx.SetViaDiameter(700000)
+        xx.SetViaDiameter(800000)
         
         for m in pcb.GetTracks():
             if (isinstance(m, pcbnew.VIA)):
