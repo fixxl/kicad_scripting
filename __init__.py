@@ -24,3 +24,6 @@ Create_Output().register()
 
 from Elecrow_Design_Rules import *
 Elecrow_Design_Rules().register()
+
+from Use_STEP_3D import *
+Use_STEP_3D().register()
