@@ -8,6 +8,8 @@ class Use_STEP_3D( pcbnew.ActionPlugin ):
 
     def Run( self ):
         pcbfile = str(pcbnew.GetBoard().GetFileName())
+        
+        pcbnew.SaveBoard(pcbfile, pcbnew.GetBoard())
 
         with open(pcbfile,'r') as f:
             data = f.read()
@@ -17,8 +19,7 @@ class Use_STEP_3D( pcbnew.ActionPlugin ):
         with open(pcbfile,'w') as f:
             f.write(data)
             
-        pcbnew.LoadBoard(pcbfile)
-        pcbnew.Refresh()
+        pcb = pcbnew.LoadBoard(pcbfile)
 
 if __name__ == "__main__":
     Use_STEP_3D().Run()

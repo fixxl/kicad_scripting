@@ -67,28 +67,29 @@ class Print_Board_Dimensions ( pcbnew.ActionPlugin ):
                 
                 i += 1     
                
-        dim_x = math.ceil(pcbnew.ToMM(max_x - min_x))
-        dim_y = math.ceil(pcbnew.ToMM(max_y - min_y))
-        
-        addnew = True
-        tt = pcbnew.TEXTE_PCB(pcb)
-        
-        for drawing in pcb.GetDrawings():              
-            if isinstance(drawing,pcbnew.TEXTE_PCB): 
-                if (drawing.GetText().split(':', 1)[0]=="Board dimensions" and drawing.GetLayer() == pcbnew.Cmts_User and drawing.GetPosition()[0] == 178300000 and drawing.GetPosition()[1] == 174000000):
-                    tt = drawing                   
-                    addnew = False                          
-        
-        tt.SetText("Board dimensions: %dmm x %dmm" % (dim_x, dim_y))
-        tt.SetHorizJustify(-1)
-        tt.SetThickness(pcbnew.FromMM(0.2))
-        tt.SetPosition(pcbnew.wxPointMM(178.3, 174))
-        tt.SetLayer(pcbnew.Cmts_User)
-        
-        if (addnew):
-            pcb.Add(tt)
+        if (i > 0):
+            dim_x = math.ceil(pcbnew.ToMM(max_x - min_x))
+            dim_y = math.ceil(pcbnew.ToMM(max_y - min_y))
             
-        pcb.SetAuxOrigin(pcbnew.wxPoint(min_x, min_y))
+            addnew = True
+            tt = pcbnew.TEXTE_PCB(pcb)
+            
+            for drawing in pcb.GetDrawings():              
+                if isinstance(drawing,pcbnew.TEXTE_PCB): 
+                    if (drawing.GetText().split(':', 1)[0]=="Board dimensions" and drawing.GetLayer() == pcbnew.Cmts_User and drawing.GetPosition()[0] == 178300000 and drawing.GetPosition()[1] == 174000000):
+                        tt = drawing                   
+                        addnew = False                          
+            
+            tt.SetText("Board dimensions: %dmm x %dmm" % (dim_x, dim_y))
+            tt.SetHorizJustify(-1)
+            tt.SetThickness(pcbnew.FromMM(0.2))
+            tt.SetPosition(pcbnew.wxPointMM(178.3, 174))
+            tt.SetLayer(pcbnew.Cmts_User)
+            
+            if (addnew):
+                pcb.Add(tt)
+                
+            pcb.SetAuxOrigin(pcbnew.wxPoint(min_x, min_y))
 
 if __name__ == "__main__":
     Print_Board_Dimensions().Run()
