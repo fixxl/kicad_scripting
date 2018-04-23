@@ -20,6 +20,7 @@
 
 import pcbnew
 import os
+from Print_Board_Dimensions import *
 
 class Create_Output( pcbnew.ActionPlugin ):
     def defaults (self):
@@ -29,6 +30,8 @@ class Create_Output( pcbnew.ActionPlugin ):
 
 
     def Run (self):      
+        Print_Board_Dimensions().Run()
+        
         board = pcbnew.GetBoard()
 
         ff = board.GetFileName().replace("\\","/")
