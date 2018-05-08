@@ -30,13 +30,19 @@ class Make_BOM( pcbnew.ActionPlugin ):
         mods = pcb.GetModules()
         
         for m in mods:
-            if(m.GetValue()[0:12] != "MountingHole"):
+            if((m.GetValue()[0:12] != "MountingHole") and (str(m.GetFPID().GetUniStringLibItemName()[0:9]) != "TestPoint")):
                 refmaxlen = max(len(m.GetReference()), refmaxlen)
                 valmaxlen = max(len(m.GetValue()), valmaxlen)
                 packmaxlen = max(len(str(m.GetFPID().GetUniStringLibItemName())), packmaxlen)
                 reftype.append(str(re.split('[0-9,\*]', m.GetReference(), 1)[0]))
                 
         reftype = sorted(list(set(reftype)))
+        
+        if(" ") in reftype:
+            reftype.remove(" ")
+            
+        print(reftype)
+        
         refmaxlen += 4
         valmaxlen += 4
         
@@ -49,12 +55,16 @@ class Make_BOM( pcbnew.ActionPlugin ):
         filecontent.append("-" * (refmaxlen - 2) + "  " + "-" * (valmaxlen - 2) + "  " + "-" * (packmaxlen))
         
         for typus in reftype:
-            filecontent.append(typus)
+            newgroup = 1
             for i in range(0, 500):
                 if (isinstance(pcb.FindModuleByReference(typus + str(i)), pcbnew.MODULE)):
+                    if newgroup == 1:
+                        newgroup = 2
+                        filecontent.append(typus)
                     m = pcb.FindModuleByReference(typus + str(i))
                     filecontent.append("{}{}{}{}{}".format(m.GetReference(), FillWithSpaces(len(m.GetReference()), refmaxlen), m.GetValue(), FillWithSpaces(len(m.GetValue()), valmaxlen), str(m.GetFPID().GetUniStringLibItemName())))
-            filecontent.append("")
+            if newgroup == 2:
+                filecontent.append("")
         
         # print(filecontent)
         
