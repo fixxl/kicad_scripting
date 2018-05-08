@@ -27,3 +27,6 @@ Elecrow_Design_Rules().register()
 
 from Use_STEP_3D import *
 Use_STEP_3D().register()
+
+from Make_BOM import *
+Make_BOM().register()
