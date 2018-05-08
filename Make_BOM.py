@@ -4,9 +4,9 @@ import re
 class Make_BOM( pcbnew.ActionPlugin ):    
     
     def defaults( self ):
-        self.name = "Add PCB milling"
-        self.category = "Modify PCB"
-        self.description = "Add milling to the PCB, milling tool radius can be considered"
+        self.name = "Make Bill of Materials (BOM)"
+        self.category = "Documentation"
+        self.description = "Create a textfile with all modules used in the PCB"
 
         
     def Run (self):
