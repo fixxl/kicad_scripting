@@ -116,7 +116,7 @@ class Make_BOM( pcbnew.ActionPlugin ):
             headline = FormStr(str("Bill of materials for " + pcb.GetFileName().replace('\\','/').rsplit('/', 1)[1]), latexbom)
             filecontent.append(headline)
             if latexbom:
-                filecontent.append("}\n\\end{center}\n\n\\begin{longtabu} to \\textwidth[l]{p{1.8cm}p{3cm}X}")
+                filecontent.append("}\n\\end{center}\n\n\\begin{longtabu} to \\textwidth[l]{p{1.8cm}p{4cm}X}")
             else:
                 filecontent.append("=" * len(headline))
                 filecontent.append("")
