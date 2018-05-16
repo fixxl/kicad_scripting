@@ -57,7 +57,7 @@ class Make_BOM( pcbnew.ActionPlugin ):
         def FillWithSpaces(occupied_slots, total_slots):
             return(" " * (total_slots - occupied_slots))
             
-        def FormStr(strng, latexbom):
+        def FormStr(strng, latexbom=True):
             if latexbom:
                 strng = strng.replace("_", "\_")
             
@@ -88,6 +88,7 @@ class Make_BOM( pcbnew.ActionPlugin ):
             packmaxlen = 0
             
             reftype = []
+            partsinpcb = []
             
             mods = pcb.GetModules()
             
@@ -103,7 +104,7 @@ class Make_BOM( pcbnew.ActionPlugin ):
             if(" ") in reftype:
                 reftype.remove(" ")
                 
-            # print(reftype)
+            print(reftype)          
             
             refmaxlen += 4
             valmaxlen += 4
@@ -135,25 +136,46 @@ class Make_BOM( pcbnew.ActionPlugin ):
                             filecontent.append(typus + " & & \\\\" if latexbom else typus)
                         m = pcb.FindModuleByReference(typus + str(i))
                         filecontent.append("{}{}{}{}{}{}".format(FormStr(m.GetReference(), latexbom), " & " if latexbom else FillWithSpaces(len(m.GetReference()), refmaxlen), FormStr(m.GetValue(), latexbom), " & " if latexbom else FillWithSpaces(len(m.GetValue()), valmaxlen), FormStr(str(m.GetFPID().GetUniStringLibItemName()), latexbom), "\\\\" if latexbom else ""))
+                        
+                        partsinpcb.append(str(re.split('[0-9,\*]', m.GetReference(), 1)[0] + " " + m.GetValue() + " " + str(m.GetFPID().GetUniStringLibItemName())))
+                        
                 if newgroup == 2:
                     filecontent.append("\\hline\n" if latexbom else "")
             
+            numofparts = dict((i, partsinpcb.count(i)) for i in partsinpcb)
+            partsinpcb = []
+            
+            for key in sorted(numofparts.iterkeys()):
+                if(latexbom):
+                    partsinpcb.append("%s & %s & %s & %s \\\\" % (FormStr(key.split(" ", 2)[0]), FormStr(key.split(" ", 2)[1]), FormStr(key.split(" ", 2)[2]), numofparts[key]))
+                else:
+                    partsinpcb.append("%s %s %s %s" % (key.split(" ", 2)[0], key.split(" ", 2)[1], key.split(" ", 2)[2], numofparts[key]))
+            
+            if latexbom:
+                filecontent.append("\\end{longtabu}\n\n\n\\begin{longtabu} to \\textwidth[l]{p{1cm}p{4cm}Xc}")
+            else:
+                filecontent.append("")
+            
+            filecontent.append("Part-Type{}Value/Name{}Package{}Quantity{}".format(" & " if latexbom else FillWithSpaces(len("Part-Type"), refmaxlen), " & " if latexbom else FillWithSpaces(len("Value/Name"), valmaxlen), " & " if latexbom else FillWithSpaces(len("Value/Name"), valmaxlen)," \\\\ \\hline\\hline\n\\endhead" if latexbom else ""))
+            
+            for p in partsinpcb:
+                filecontent.append(p)
+            
             if latexbom:
                 filecontent.append("\\end{longtabu}\n\\end{document}")
-            # print(filecontent)
             
             with open(filename, 'w') as f:
                 for fc in filecontent:
                     f.write("%s\n" % fc)
                     
-            if(latexbom):                
-                os.chdir(filepath)
-                os.system("lualatex --shell-escape -interaction=nonstopmode \"" + filename + "\"")
-                
-                endings = ["aux", "synctex.gz", "log", "tex"]
-                for ee in endings:
-                    if (os.path.isfile(fileroot + "_bom." + ee)):
-                        os.remove(fileroot + "_bom." + ee)
+            #if(latexbom):                
+            #    os.chdir(filepath)
+            #    os.system("lualatex --shell-escape -interaction=nonstopmode \"" + filename + "\"")
+            #    
+            #    endings = ["aux", "synctex.gz", "log", "tex"]
+            #    for ee in endings:
+            #        if (os.path.isfile(fileroot + "_bom." + ee)):
+            #            os.remove(fileroot + "_bom." + ee)
                 
             
 if __name__ == "__main__":
