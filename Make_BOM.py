@@ -55,7 +55,7 @@ class Make_BOM( pcbnew.ActionPlugin ):
 
 
         def FillWithSpaces(occupied_slots, total_slots):
-            return(" " * (total_slots - occupied_slots))
+            return(" " * (max(total_slots - occupied_slots,0)))
             
         def FormStr(strng, latexbom=True):
             if latexbom:
@@ -109,13 +109,13 @@ class Make_BOM( pcbnew.ActionPlugin ):
             
             # LaTeX Document Header
             if latexbom:
-                filecontent.append("\\documentclass[paper=a4]{scrartcl}\n\n\\usepackage[intlimits]{amsmath}\n\\usepackage{amsfonts, amssymb, array, longtable, tabu, scrlayer-scrpage, fontspec, unicode-math, icomma, textcomp, microtype}\n\\usepackage[hang]{caption}\n\\usepackage[per-mode=fraction, locale=DE,detect-all=true]{siunitx}\n\\usepackage[margin=15mm, bottom=5mm,  includefoot]{geometry}\n\\usepackage{polyglossia}\n\\usepackage[autostyle]{csquotes}\n\n\\newcommand{\\origttfamily}{}\n\\let\\origttfamily=\\ttfamily\n\\renewcommand{\\ttfamily}{\\origttfamily\n\\hyphenchar\\font=`\\-}\n\\setmainfont{Tex Gyre Termes}\n\\setmathfont{Tex Gyre Termes Math}\n\\setsansfont{Latin Modern Sans}[Scale=MatchLowercase]\n\\setmonofont{LMMonoLt10-Bold}[Scale=MatchLowercase]\n\n\\defaultfontfeatures{Ligatures=TeX}\n\n\\begin{document}\n\\begin{center}\n\\textbf{\\large\\sffamily%")
+                filecontent.append("\\documentclass[paper=a4]{scrartcl}\n\n\\usepackage[intlimits]{amsmath}\n\\usepackage{amsfonts, amssymb, array, longtable, tabu, scrlayer-scrpage, fontspec, unicode-math, icomma, textcomp, microtype}\n\\usepackage[hang]{caption}\n\\usepackage[per-mode=fraction, locale=DE,detect-all=true]{siunitx}\n\\usepackage[margin=15mm, bottom=5mm,  includefoot]{geometry}\n\\usepackage{polyglossia}\n\\usepackage[autostyle]{csquotes}\n\n\\newcommand{\\origttfamily}{}\n\\let\\origttfamily=\\ttfamily\n\\renewcommand{\\ttfamily}{\\origttfamily\n\\hyphenchar\\font=`\\-}\n\\setmainfont{TeX Gyre Termes}\n\\setsansfont{Latin Modern Sans}[Scale=MatchLowercase]\n\\setmonofont{LMMonoLt10-Bold}[Scale=MatchLowercase]\n\n\\defaultfontfeatures{Ligatures=TeX}\n\n\\begin{document}\n\\begin{center}\n\\textbf{\\large\\sffamily%")
             
             # Print pcb-name
             headline = FormStr(str("Bill of materials for " + pcb.GetFileName().replace('\\','/').rsplit('/', 1)[1]), latexbom)
             filecontent.append(headline)
             if latexbom:
-                filecontent.append("}\n\\end{center}\n\n\\subsection*{Index of parts}\n\n\\begin{longtabu} to \\textwidth[l]{p{1.8cm}p{4cm}X}")
+                filecontent.append("}\n\\end{center}\n\n\\subsection*{Index of parts}\n\n\\begin{longtabu} to \\textwidth[l]{lX[-1]X}")
             else:
                 filecontent.append("=" * len(headline))
                 filecontent.append("")
@@ -136,7 +136,7 @@ class Make_BOM( pcbnew.ActionPlugin ):
                         m = pcb.FindModuleByReference(typus + str(i))
                         filecontent.append("{}{}{}{}{}{}".format(FormStr(m.GetReference(), latexbom), " & " if latexbom else FillWithSpaces(len(m.GetReference()), refmaxlen), FormStr(m.GetValue(), latexbom), " & " if latexbom else FillWithSpaces(len(m.GetValue()), valmaxlen), FormStr(str(m.GetFPID().GetUniStringLibItemName()), latexbom), "\\\\" if latexbom else ""))
                         
-                        partsinpcb.append(str(re.split('[0-9,\*]', m.GetReference(), 1)[0] + " " + m.GetValue() + " " + str(m.GetFPID().GetUniStringLibItemName())))
+                        partsinpcb.append(str(re.split('[0-9,\*]', m.GetReference(), 1)[0] + " " + str(m.GetFPID().GetUniStringLibItemName()) + " " + m.GetValue()))
                         
                 if newgroup == 2:
                     filecontent.append("\\hline\n" if latexbom else "")
@@ -181,19 +181,19 @@ class Make_BOM( pcbnew.ActionPlugin ):
                 else:
                     if key.split(" ", 2)[0] != oldtype:
                         partsinpcb.append("")
-                    partsinpcb.append("%s%s%s%s%s%s%s" % (key.split(" ", 2)[0], FillWithSpaces(len(key.split(" ", 2)[0]), refmaxlen), key.split(" ", 2)[1], FillWithSpaces(len(key.split(" ", 2)[1]), valmaxlen), key.split(" ", 2)[2], FillWithSpaces(len(key.split(" ", 2)[2]), packmaxlen+4), valnumpairs[key]))
+                    partsinpcb.append("%s%s%s%s%s%s%s" % (key.split(" ", 2)[0], FillWithSpaces(len(key.split(" ", 2)[0]), refmaxlen), key.split(" ", 2)[1], FillWithSpaces(len(key.split(" ", 2)[1]), packmaxlen+4), key.split(" ", 2)[2], FillWithSpaces(len(key.split(" ", 2)[2]), valmaxlen), valnumpairs[key]))
                 oldtype = key.split(" ", 2)[0]
             
             if latexbom:
-                filecontent.append("\\end{longtabu}\n\\vspace{20mm}\n\\newpage\n\\subsection*{Shopping list}\n\n\\begin{longtabu} to \\textwidth[l]{p{1cm}p{4cm}Xc}")
+                filecontent.append("\\end{longtabu}\n\\vspace{20mm}\n\\newpage\n\\subsection*{Shopping list}\n\n\\begin{longtabu} to \\textwidth[l]{lXX[-1]c}")
             else:
                 filecontent.append("")
                 filecontent.append("Shopping list")
             
-            filecontent.append("Type{}Value/Name{}Package{}Quantity{}".format(" & " if latexbom else FillWithSpaces(len("Type"), refmaxlen), " & " if latexbom else FillWithSpaces(len("Value/Name"), valmaxlen), " & " if latexbom else FillWithSpaces(len("Package"), packmaxlen+4)," \\\\ \\hline\\hline\n\\endhead" if latexbom else ""))
+            filecontent.append("Type{}Package{}Value/Name{}Quantity{}".format(" & " if latexbom else FillWithSpaces(len("Type"), refmaxlen), " & " if latexbom else FillWithSpaces(len("Package"), packmaxlen+4), " & " if latexbom else FillWithSpaces(len("Value/Name"), valmaxlen)," \\\\ \\hline\\hline\n\\endhead" if latexbom else ""))
             
             if not latexbom:
-                filecontent.append("-" * (refmaxlen - 2) + "  " + "-" * (valmaxlen - 2) + "  " + "-" * (packmaxlen+3) + " " + "-" * len("Quantity"))
+                filecontent.append("-" * (refmaxlen - 2) + "  " + "-" * (packmaxlen + 2) + "  " + "-" * (valmaxlen-2) + "  " + "-" * len("Quantity"))
             
             for p in partsinpcb:
                 filecontent.append(p)
