@@ -79,10 +79,8 @@ class Make_BOM( pcbnew.ActionPlugin ):
                 filename = fileroot + "_bom.tex"
             else:
                 filename = fileroot + "_bom.txt"
-            print(filename)
-            print(filepath)
             
-            # Initialise maximum lengths to 0
+            # Initialise maximum lengths
             refmaxlen = 7
             valmaxlen = 3
             packmaxlen = 0
@@ -102,25 +100,26 @@ class Make_BOM( pcbnew.ActionPlugin ):
             reftype = sorted(list(set(reftype)))
             
             if(" ") in reftype:
-                reftype.remove(" ")
-                
-            print(reftype)          
+                reftype.remove(" ")        
             
             refmaxlen += 4
             valmaxlen += 4
                   
             filecontent = []
             
+            # LaTeX Document Header
             if latexbom:
-                filecontent.append("\\documentclass[paper=a4]{scrartcl}\n\n\\usepackage[intlimits]{amsmath}\n\\usepackage{amsfonts, amssymb, array, longtable, tabu, scrlayer-scrpage, fontspec, unicode-math, icomma, textcomp, microtype}\n\\usepackage[hang]{caption}\n\\usepackage[per-mode=fraction, locale=DE,detect-all=true]{siunitx}\n\\usepackage[margin=15mm]{geometry}\n\\usepackage{polyglossia}\n\\usepackage[autostyle]{csquotes}\n\n\\newcommand{\\origttfamily}{}\n\\let\\origttfamily=\\ttfamily\n\\renewcommand{\\ttfamily}{\\origttfamily\n\\hyphenchar\\font=`\\-}\n\\setmainfont{Tex Gyre Termes}\n\\setmathfont{Tex Gyre Termes Math}\n\\setsansfont{Latin Modern Sans}[Scale=MatchLowercase]\n\\setmonofont{LMMonoLt10-Bold}[Scale=MatchLowercase]\n\n\\defaultfontfeatures{Ligatures=TeX}\n\n\\begin{document}\n\\begin{center}\n\\textbf{%")
+                filecontent.append("\\documentclass[paper=a4]{scrartcl}\n\n\\usepackage[intlimits]{amsmath}\n\\usepackage{amsfonts, amssymb, array, longtable, tabu, scrlayer-scrpage, fontspec, unicode-math, icomma, textcomp, microtype}\n\\usepackage[hang]{caption}\n\\usepackage[per-mode=fraction, locale=DE,detect-all=true]{siunitx}\n\\usepackage[margin=15mm, bottom=5mm,  includefoot]{geometry}\n\\usepackage{polyglossia}\n\\usepackage[autostyle]{csquotes}\n\n\\newcommand{\\origttfamily}{}\n\\let\\origttfamily=\\ttfamily\n\\renewcommand{\\ttfamily}{\\origttfamily\n\\hyphenchar\\font=`\\-}\n\\setmainfont{Tex Gyre Termes}\n\\setmathfont{Tex Gyre Termes Math}\n\\setsansfont{Latin Modern Sans}[Scale=MatchLowercase]\n\\setmonofont{LMMonoLt10-Bold}[Scale=MatchLowercase]\n\n\\defaultfontfeatures{Ligatures=TeX}\n\n\\begin{document}\n\\begin{center}\n\\textbf{\\large\\sffamily%")
             
+            # Print pcb-name
             headline = FormStr(str("Bill of materials for " + pcb.GetFileName().replace('\\','/').rsplit('/', 1)[1]), latexbom)
             filecontent.append(headline)
             if latexbom:
-                filecontent.append("}\n\\end{center}\n\n\\begin{longtabu} to \\textwidth[l]{p{1.8cm}p{4cm}X}")
+                filecontent.append("}\n\\end{center}\n\n\\subsection*{Index of parts}\n\n\\begin{longtabu} to \\textwidth[l]{p{1.8cm}p{4cm}X}")
             else:
                 filecontent.append("=" * len(headline))
                 filecontent.append("")
+                filecontent.append("Index of parts")
                     
             filecontent.append("Reference{}Value/Name{}Package{}".format(" & " if latexbom else FillWithSpaces(len("Reference"), refmaxlen), " & " if latexbom else FillWithSpaces(len("Value/Name"), valmaxlen), " \\\\ \\hline\\hline\n\\endhead" if latexbom else ""))
             
@@ -142,40 +141,78 @@ class Make_BOM( pcbnew.ActionPlugin ):
                 if newgroup == 2:
                     filecontent.append("\\hline\n" if latexbom else "")
             
+            # Create shopping list according to Reference letter(s)
             numofparts = dict((i, partsinpcb.count(i)) for i in partsinpcb)
-            partsinpcb = []
             
-            for key in sorted(numofparts.iterkeys()):
-                if(latexbom):
-                    partsinpcb.append("%s & %s & %s & %s \\\\" % (FormStr(key.split(" ", 2)[0]), FormStr(key.split(" ", 2)[1]), FormStr(key.split(" ", 2)[2]), numofparts[key]))
+            partsinpcb = []
+            valpackpairs = dict()
+            valnumpairs = dict()
+            
+            for k in numofparts:
+                d1 = {k.split(" ", 1)[1]: k.split(" ", 1)[0]}
+                d2 = {k.split(" ", 1)[1]: numofparts[k]}
+                
+                if d1.keys()[0] not in valpackpairs.keys():
+                    valpackpairs.update(d1)
                 else:
-                    partsinpcb.append("%s %s %s %s" % (key.split(" ", 2)[0], key.split(" ", 2)[1], key.split(" ", 2)[2], numofparts[key]))
+                    if(ord(k.split(" ", 1)[0]) > ord(valpackpairs[d1.keys()[0]])):
+                        valpackpairs[d1.keys()[0]] += "/" + k.split(" ", 1)[0]
+                    else:
+                        valpackpairs[d1.keys()[0]] = k.split(" ", 1)[0] + "/" + valpackpairs[d1.keys()[0]]
+                    
+                if d2.keys()[0] not in valnumpairs.keys():
+                    valnumpairs.update(d2)
+                else:
+                    valnumpairs[d2.keys()[0]] += numofparts[k]
+            
+            
+            # Update keys in the dictionary
+            for k in valnumpairs.keys():
+                valnumpairs[valpackpairs[k] + " " + k] = valnumpairs[k]
+                del valnumpairs[k]
+               
+            
+            oldtype = sorted(valnumpairs)[0].split(" ", 1)[0]
+            for key in sorted(valnumpairs.iterkeys()):
+                if(latexbom):
+                    if key.split(" ", 2)[0] != oldtype:
+                        partsinpcb.append("\\hline")
+                    partsinpcb.append("%s & %s & %s & %s \\\\" % (FormStr(key.split(" ", 2)[0]), FormStr(key.split(" ", 2)[1]), FormStr(key.split(" ", 2)[2]), valnumpairs[key]))
+                else:
+                    if key.split(" ", 2)[0] != oldtype:
+                        partsinpcb.append("")
+                    partsinpcb.append("%s%s%s%s%s%s%s" % (key.split(" ", 2)[0], FillWithSpaces(len(key.split(" ", 2)[0]), refmaxlen), key.split(" ", 2)[1], FillWithSpaces(len(key.split(" ", 2)[1]), valmaxlen), key.split(" ", 2)[2], FillWithSpaces(len(key.split(" ", 2)[2]), packmaxlen+4), valnumpairs[key]))
+                oldtype = key.split(" ", 2)[0]
             
             if latexbom:
-                filecontent.append("\\end{longtabu}\n\n\n\\begin{longtabu} to \\textwidth[l]{p{1cm}p{4cm}Xc}")
+                filecontent.append("\\end{longtabu}\n\\vspace{20mm}\n\\newpage\n\\subsection*{Shopping list}\n\n\\begin{longtabu} to \\textwidth[l]{p{1cm}p{4cm}Xc}")
             else:
                 filecontent.append("")
+                filecontent.append("Shopping list")
             
-            filecontent.append("Part-Type{}Value/Name{}Package{}Quantity{}".format(" & " if latexbom else FillWithSpaces(len("Part-Type"), refmaxlen), " & " if latexbom else FillWithSpaces(len("Value/Name"), valmaxlen), " & " if latexbom else FillWithSpaces(len("Value/Name"), valmaxlen)," \\\\ \\hline\\hline\n\\endhead" if latexbom else ""))
+            filecontent.append("Type{}Value/Name{}Package{}Quantity{}".format(" & " if latexbom else FillWithSpaces(len("Type"), refmaxlen), " & " if latexbom else FillWithSpaces(len("Value/Name"), valmaxlen), " & " if latexbom else FillWithSpaces(len("Package"), packmaxlen+4)," \\\\ \\hline\\hline\n\\endhead" if latexbom else ""))
+            
+            if not latexbom:
+                filecontent.append("-" * (refmaxlen - 2) + "  " + "-" * (valmaxlen - 2) + "  " + "-" * (packmaxlen+3) + " " + "-" * len("Quantity"))
             
             for p in partsinpcb:
                 filecontent.append(p)
             
             if latexbom:
-                filecontent.append("\\end{longtabu}\n\\end{document}")
+                filecontent.append("\\hline\n\\end{longtabu}\n\\end{document}")
             
             with open(filename, 'w') as f:
                 for fc in filecontent:
                     f.write("%s\n" % fc)
                     
-            #if(latexbom):                
-            #    os.chdir(filepath)
-            #    os.system("lualatex --shell-escape -interaction=nonstopmode \"" + filename + "\"")
-            #    
-            #    endings = ["aux", "synctex.gz", "log", "tex"]
-            #    for ee in endings:
-            #        if (os.path.isfile(fileroot + "_bom." + ee)):
-            #            os.remove(fileroot + "_bom." + ee)
+            if(latexbom):                
+                os.chdir(filepath)
+                os.system("lualatex --shell-escape -interaction=nonstopmode \"" + filename + "\"")
+                
+                endings = ["aux", "synctex.gz", "log", "tex"]
+                for ee in endings:
+                    if (os.path.isfile(fileroot + "_bom." + ee)):
+                        os.remove(fileroot + "_bom." + ee)
                 
             
 if __name__ == "__main__":
