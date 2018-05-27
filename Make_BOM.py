@@ -132,7 +132,7 @@ class Make_BOM( pcbnew.ActionPlugin ):
                     if (isinstance(pcb.FindModuleByReference(typus + str(i)), pcbnew.MODULE)):
                         if newgroup == 1:
                             newgroup = 2
-                            filecontent.append(typus + " & & \\\\" if latexbom else typus)
+                            filecontent.append(typus + " & & \\\\*" if latexbom else typus)
                         m = pcb.FindModuleByReference(typus + str(i))
                         filecontent.append("{}{}{}{}{}{}".format(FormStr(m.GetReference(), latexbom), " & " if latexbom else FillWithSpaces(len(m.GetReference()), refmaxlen), FormStr(m.GetValue(), latexbom), " & " if latexbom else FillWithSpaces(len(m.GetValue()), valmaxlen), FormStr(str(m.GetFPID().GetUniStringLibItemName()), latexbom), "\\\\" if latexbom else ""))
                         
@@ -185,7 +185,7 @@ class Make_BOM( pcbnew.ActionPlugin ):
                 oldtype = key.split(" ", 2)[0]
             
             if latexbom:
-                filecontent.append("\\end{longtabu}\n\\vspace{20mm}\n\\newpage\n\\subsection*{Shopping list}\n\n\\begin{longtabu} to \\textwidth[l]{lXX[-1]c}")
+                filecontent.append("\\end{longtabu}\n\\vspace{20mm}\n\\newpage\n\\subsection*{Shopping list}\n\n\\begin{longtabu} to \\textwidth[l]{p{18mm}XX[-1]c}")
             else:
                 filecontent.append("")
                 filecontent.append("Shopping list")
