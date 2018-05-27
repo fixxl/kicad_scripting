@@ -155,7 +155,7 @@ class Make_BOM( pcbnew.ActionPlugin ):
                 if d1.keys()[0] not in valpackpairs.keys():
                     valpackpairs.update(d1)
                 else:
-                    if(ord(k.split(" ", 1)[0]) > ord(valpackpairs[d1.keys()[0]])):
+                    if(k.split(" ", 1)[0] > valpackpairs[d1.keys()[0]):
                         valpackpairs[d1.keys()[0]] += "/" + k.split(" ", 1)[0]
                     else:
                         valpackpairs[d1.keys()[0]] = k.split(" ", 1)[0] + "/" + valpackpairs[d1.keys()[0]]
