@@ -11,10 +11,10 @@ class Set_Value_Layer ( pcbnew.ActionPlugin ):
     def Run(self):
         class displayDialog(wx.Dialog):
             def __init__(self, parent):
-                wx.Dialog.__init__(self, parent, id=-1, title="Polygon settings", size = (250,130))#
+                wx.Dialog.__init__(self, parent, id=-1, title="Polygon settings", size = (250,150))#
                 
                 self.panel = wx.Panel(self) 
-                vbox = wx.GridSizer(4, 2, 0, 0) 
+                vbox = wx.GridSizer(5, 2, 0, 0) 
                 
                 self.apply_to_all = False
                 self.lay = "Fab"
@@ -43,7 +43,13 @@ class Set_Value_Layer ( pcbnew.ActionPlugin ):
                 self.t3 = wx.ComboBox(self.panel, choices=LayerList)
                 self.t3.SetSelection(0)
                 vbox.Add(self.t3,0, wx.EXPAND)
-                self.t3.Bind(wx.EVT_COMBOBOX, self.on_hbox3)    
+                self.t3.Bind(wx.EVT_COMBOBOX, self.on_hbox3)
+
+                self.t6 = wx.CheckBox(self.panel, label="Include values of test points")
+                self.t6.SetValue(False)
+                vbox.Add(self.t6, 0, wx.ALIGN_LEFT, 0)
+                l5 = wx.StaticText(self.panel, label="") 
+                vbox.Add(l5, 0, wx.ALIGN_RIGHT,0)                 
 
                 btn_ok = wx.Button(self.panel,-1,"OK")
                 btn_ok.Bind(wx.EVT_BUTTON,self.on_ok_clicked)
@@ -112,7 +118,9 @@ class Set_Value_Layer ( pcbnew.ActionPlugin ):
 
                         if (Layerside == "F") or (Layerside == "B"):
                             newLayer = "pcbnew." + Layerside + "_" + frame.lay                       
-                            m.Value().SetLayer(eval(newLayer))           
+                            if (not m.Reference().GetText()[0:2]=="TP") or frame.t6.GetValue():
+                                m.Value().SetLayer(eval(newLayer))           
+                    
                     if (frame.descriptor & 2):
                         curLayer = m.Reference().GetLayerName()
                         Layerside = curLayer.split(".")[0] 
