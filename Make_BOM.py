@@ -20,7 +20,7 @@ class Make_BOM( pcbnew.ActionPlugin ):
                 self.format_is_latex = False
 
                 self.panel = wx.Panel(self) 
-                vbox = wx.GridSizer(2, 2, 0, 0) 
+                vbox = wx.GridSizer(3, 2, 0, 0) 
                 
                 l1 = wx.StaticText(self.panel, -1, "Which format: ") 
                 vbox.Add(l1, 0, wx.EXPAND) 
@@ -28,6 +28,12 @@ class Make_BOM( pcbnew.ActionPlugin ):
                 self.t1 = wx.ComboBox(self.panel, choices=ApplyToList)
                 self.t1.SetSelection(0)                                
                 vbox.Add(self.t1,0, wx.EXPAND)
+
+                self.t2 = wx.CheckBox(self.panel, label="Keep source for PDF-BOM")
+                self.t2.SetValue(False)
+                vbox.Add(self.t2, 0, wx.ALIGN_LEFT, 0)
+                
+                vbox.Add(wx.StaticText(self.panel, -1, ""), 0, wx.ALIGN_LEFT, 0)
                 
                 btn_ok = wx.Button(self.panel,-1,"OK")
                 btn_ok.Bind(wx.EVT_BUTTON,self.on_ok_clicked)
@@ -273,7 +279,7 @@ class Make_BOM( pcbnew.ActionPlugin ):
                 os.chdir(filepath)
                 os.system("lualatex --shell-escape -interaction=nonstopmode \"" + filename + "\"")
                 
-                endings = ["aux", "synctex.gz", "log", "tex"]
+                endings = ["aux", "synctex.gz", "log"] if frame.t2.GetValue() else ["aux", "synctex.gz", "log", "tex"]
                 for ee in endings:
                     if (os.path.isfile(fileroot + "_bom." + ee)):
                         os.remove(fileroot + "_bom." + ee)
