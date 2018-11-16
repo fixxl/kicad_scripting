@@ -26,11 +26,13 @@ class Make_BOM( pcbnew.ActionPlugin ):
                 vbox.Add(l1, 0, wx.EXPAND) 
                 ApplyToList = ['Plain Text', 'PDF (needs LaTeX)']           
                 self.t1 = wx.ComboBox(self.panel, choices=ApplyToList)
-                self.t1.SetSelection(0)                                
+                self.t1.SetSelection(0)                               
+                self.t1.Bind(wx.EVT_COMBOBOX, self.item_selected)
                 vbox.Add(self.t1,0, wx.EXPAND)
 
                 self.t2 = wx.CheckBox(self.panel, label="Keep source for PDF-BOM")
                 self.t2.SetValue(False)
+                self.t2.Disable()
                 vbox.Add(self.t2, 0, wx.ALIGN_LEFT, 0)
                 
                 vbox.Add(wx.StaticText(self.panel, -1, ""), 0, wx.ALIGN_LEFT, 0)
@@ -57,6 +59,12 @@ class Make_BOM( pcbnew.ActionPlugin ):
             def on_cancel_clicked(self, event):
                 self.perform_changes = False
                 self.Destroy()
+                
+            def item_selected(self, event):
+                if (self.t1.GetValue()=="Plain Text"):
+                    self.t2.Disable()
+                else:
+                    self.t2.Enable()
                 
 
 
