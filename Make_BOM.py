@@ -217,7 +217,7 @@ class Make_BOM( pcbnew.ActionPlugin ):
                     
                 print("{} {} {} {}".format(str(x), str(value_package_number[concluded_list[x]]), str(concluded_list[x]).split(' ++++++ ', 2)[0], str(concluded_list[x]).split(' ++++++ ', 2)[1]))
                 
-                filecontent.append("{}{}{}{}{}{}{}{}".format(FormStr(str(x), latexbom), " & " if latexbom else FillWithSpaces(len(str(x)), refmaxlen2), FormStr(str(value_package_number[concluded_list[x]]), latexbom), " & " if latexbom else FillWithSpaces(len(str(value_package_number[concluded_list[x]])), countmaxlen2), FormStr(str(concluded_list[x]).split(' ++++++ ', 2)[0], latexbom), " & " if latexbom else FillWithSpaces(len(str(concluded_list[x]).split(' ++++++ ', 2)[0]), valmaxlen2), FormStr("\\seqsplit{" + str(concluded_list[x]).split(' ++++++ ', 2)[1] + "}", latexbom), " \\\\" if latexbom else ""))
+                filecontent.append("{}{}{}{}{}{}{}{}{}".format(FormStr(str(x), latexbom), " & " if latexbom else FillWithSpaces(len(str(x)), refmaxlen2), FormStr(str(value_package_number[concluded_list[x]]), latexbom), " & " if latexbom else FillWithSpaces(len(str(value_package_number[concluded_list[x]])), countmaxlen2), FormStr(str(concluded_list[x]).split(' ++++++ ', 2)[0], latexbom), " & " if latexbom else FillWithSpaces(len(str(concluded_list[x]).split(' ++++++ ', 2)[0]), valmaxlen2), "\\seqsplit{" if latexbom else "", FormStr(str(concluded_list[x]).split(' ++++++ ', 2)[1], latexbom), "} \\\\" if latexbom else ""))
             
             # Create shopping list according to Reference letter(s)
             numofparts = dict((i, partsinpcb.count(i)) for i in partsinpcb)
