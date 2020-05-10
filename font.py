@@ -112,7 +112,7 @@ class font( pcbnew.ActionPlugin ):
                 if frame.th > 0:
                     m.Reference().SetTextHeight(pcbnew.FromMM(frame.th))
                 if frame.thick > 0:
-                    m.Reference().SetThickness(pcbnew.FromMM(frame.thick))
+                    m.Reference().SetTextThickness(pcbnew.FromMM(frame.thick))
                 
                 pos = m.Reference().GetPosition()
                 rot = m.Reference().GetDrawRotation()
@@ -120,10 +120,10 @@ class font( pcbnew.ActionPlugin ):
                 
                 for drawing in m.GraphicalItems():
                     if isinstance(drawing,pcbnew.TEXTE_MODULE) and frame.t4.GetValue(): 
-                        if (drawing.GetText()=="%R"):
+                        if (drawing.GetText()=="${REFERENCE}"):
                             drawing.SetTextWidth(pcbnew.FromMM(frame.tw))
                             drawing.SetTextHeight(pcbnew.FromMM(frame.th))
-                            drawing.SetThickness(pcbnew.FromMM(frame.thick))                         
+                            drawing.SetTextThickness(pcbnew.FromMM(frame.thick))                         
                             drawing.SetPosition(pos)
                             drawing.Rotate(pos, rot)
                             drawing.SetTextAngle(ang)
@@ -147,7 +147,7 @@ class font( pcbnew.ActionPlugin ):
                 if frame.th > 0:
                     m.Value().SetTextHeight(pcbnew.FromMM(frame.th))
                 if frame.thick > 0:
-                    m.Value().SetThickness(pcbnew.FromMM(frame.thick))
+                    m.Value().SetTextThickness(pcbnew.FromMM(frame.thick))
 
 if __name__ == "__main__":
     font().Run()
