@@ -174,8 +174,10 @@ class Create_Rectangular_Polygons ( pcbnew.ActionPlugin ):
             poly_min_y = (min_y + pcbnew.FromMM(distance))
             poly_max_y = (max_y - pcbnew.FromMM(distance))
 
+            i = 0
             for layer in laylst:
-                poly = pcb.InsertArea(netz, 0, layer, poly_min_x, poly_min_y, pcbnew.ZONE_CONTAINER.DIAGONAL_EDGE)
+                # poly = pcb.InsertArea(netz, 0, layer, poly_min_x, poly_min_y, pcbnew.ZONE_CONTAINER.DIAGONAL_EDGE)
+                poly = pcb.InsertArea(netz, i, layer, poly_min_x, poly_min_y, 2)
                 poly.SetZoneClearance(pcbnew.FromMM(clearance))
                 poly.SetMinThickness(pcbnew.FromMM(min_thickness))
                 poly.SetThermalReliefGap(pcbnew.FromMM(thermal_gap))
@@ -186,6 +188,7 @@ class Create_Rectangular_Polygons ( pcbnew.ActionPlugin ):
                 poly.Outline().Append(poly_max_x, poly_max_y)
                 poly.Outline().Append(poly_min_x, poly_max_y)
                 poly.Hatch()
+                i += 1
 
 if __name__ == "__main__":
     Create_Rectangular_Polygons().Run()
