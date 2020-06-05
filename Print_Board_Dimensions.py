@@ -82,7 +82,7 @@ class Print_Board_Dimensions ( pcbnew.ActionPlugin ):
             
             tt.SetText("Board dimensions: %dmm x %dmm" % (dim_x, dim_y))
             tt.SetHorizJustify(-1)
-            tt.SetThickness(pcbnew.FromMM(0.2))
+            tt.SetTextThickness(pcbnew.FromMM(0.2))
             tt.SetPosition(pcbnew.wxPointMM(178.3, 174))
             tt.SetLayer(pcbnew.Cmts_User)
             
