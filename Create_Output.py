@@ -189,7 +189,7 @@ class Create_Output( pcbnew.ActionPlugin ):
         popt.SetFineScaleAdjustY(1.000)       
         
         pctl.OpenPlotfile("Layout", pcbnew.PLOT_FORMAT_PDF, "General layout")
-        popt.SetTextMode(pcbnew.PLOTTEXTMODE_STROKE)
+        popt.SetTextMode(pcbnew.PLOT_TEXT_MODE_STROKE)
 
         pctl.SetLayer(pcbnew.Edge_Cuts)
         pctl.PlotLayer()
