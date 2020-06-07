@@ -57,7 +57,7 @@ class Create_Output( pcbnew.ActionPlugin ):
 
         # Set some important plot options:
         popt.SetPlotFrameRef(False)
-        popt.SetLineWidth(pcbnew.FromMM(0.05))
+        popt.SetSketchPadLineWidth(pcbnew.FromMM(0.05))
 
         popt.SetAutoScale(False)
         popt.SetScale(1)
@@ -162,7 +162,7 @@ class Create_Output( pcbnew.ActionPlugin ):
         #######################################################################################################
 
         popt.SetA4Output(True)
-        popt.SetLineWidth(pcbnew.FromMM(0.1))
+        popt.SetSketchPadLineWidth(pcbnew.FromMM(0.1))
         # popt.SetAutoScale(True)
         
         # Switching the output directory
@@ -173,7 +173,7 @@ class Create_Output( pcbnew.ActionPlugin ):
         # Our fabricators want two additional gerbers:
         # An assembly with no silk trim and all and only the references
         # (you'll see that even holes have designators, obviously)
-        popt.SetSubtractMaskFromSilk(False)
+        # popt.SetSubtractMaskFromSilk(False)
         popt.SetPlotReference(True)
         popt.SetPlotValue(False)
         popt.SetPlotInvisibleText(False)
@@ -184,7 +184,6 @@ class Create_Output( pcbnew.ActionPlugin ):
         # Remember that the frame is always in color 0 (BLACK) and should be requested
         # before opening the plot
         popt.SetPlotFrameRef(False)
-        popt.SetPlotPadsOnSilkLayer(True)
         
         popt.SetFineScaleAdjustX(1.000)
         popt.SetFineScaleAdjustY(1.000)       
