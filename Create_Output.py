@@ -67,6 +67,7 @@ class Create_Output( pcbnew.ActionPlugin ):
         popt.SetExcludeEdgeLayer(True)
         popt.SetSubtractMaskFromSilk(True)
         popt.SetUseAuxOrigin(True)
+        popt.SetUseGerberX2format(True)
         popt.SetDrillMarksType(pcbnew.PCB_PLOT_PARAMS.NO_DRILL_SHAPE)
 
         popt.SetOutputDirectory(fabdir)
