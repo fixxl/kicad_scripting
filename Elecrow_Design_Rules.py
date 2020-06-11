@@ -26,9 +26,14 @@ class Elecrow_Design_Rules( pcbnew.ActionPlugin ):
         #xx.SetViaDiameter(800000)
         
         for m in pcb.GetTracks():          
-            if (isinstance(m, pcbnew.TRACK)):
+            if (m.GetClass()=="TRACK"):
                 if(m.GetWidth() < design_settings.m_TrackMinWidth):
                     m.SetWidth(design_settings.m_TrackMinWidth)
+            elif (m.GetClass()=="VIA"):
+                if(m.GetWidth() < design_settings.m_ViasMinSize):
+                    m.SetWidth(design_settings.m_ViasMinSize)
+                #if(m.GetWidth() < design_settings.m_ViasMinSize):
+                #    m.SetWidth(design_settings.m_ViasMinSize)
 
 if __name__ == "__main__":
     Elecrow_Design_Rules().Run()
