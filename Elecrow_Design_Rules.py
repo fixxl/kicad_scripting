@@ -32,8 +32,8 @@ class Elecrow_Design_Rules( pcbnew.ActionPlugin ):
             elif (m.GetClass()=="VIA"):
                 if(m.GetWidth() < design_settings.m_ViasMinSize):
                     m.SetWidth(design_settings.m_ViasMinSize)
-                #if(m.GetWidth() < design_settings.m_ViasMinSize):
-                #    m.SetWidth(design_settings.m_ViasMinSize)
+                if(m.Cast().GetDrill() < ViaMinDrill):
+                    m.Cast().SetDrill(ViaMinDrill)
 
 if __name__ == "__main__":
     Elecrow_Design_Rules().Run()
