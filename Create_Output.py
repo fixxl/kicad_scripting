@@ -143,6 +143,8 @@ class Create_Output( pcbnew.ActionPlugin ):
 
         metricFmt = True
         drlwriter.SetFormat( metricFmt, pcbnew.GENDRILL_WRITER_BASE.SUPPRESS_LEADING, 3, 3 )
+        
+        drlwriter.SetRouteModeForOvalHoles(True)
 
         drlwriter.CreateDrillandMapFilesSet( pctl.GetPlotDirName(), True, False );
         drlwriter.CreateDrillandMapFilesSet( mapfiledir , False, True );
