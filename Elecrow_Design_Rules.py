@@ -15,7 +15,9 @@ class Elecrow_Design_Rules( pcbnew.ActionPlugin ):
         design_settings.m_ViasMinAnnulus = 150000
         design_settings.m_TrackMinWidth = 150000
         design_settings.m_ViasMinSize = 600000
-        design_settings.m_CopperEdgeClearance = 700000
+        design_settings.m_CopperEdgeClearance = 500000
+        design_settings.m_SolderMaskMinWidth = 0
+        design_settings.m_SolderMaskMargin = 0
         
         ViaMinDrill = design_settings.m_ViasMinSize - 2*design_settings.m_ViasMinAnnulus
 
