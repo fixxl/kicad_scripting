@@ -33,6 +33,7 @@ class Create_Output( pcbnew.ActionPlugin ):
         Print_Board_Dimensions().Run()
         
         board = pcbnew.GetBoard()
+        design_settings = board.GetDesignSettings()
 
         ff = board.GetFileName().replace("\\","/")
         while("//" in r"%r" % ff):
@@ -136,7 +137,7 @@ class Create_Output( pcbnew.ActionPlugin ):
 
         mirror = False
         minimalHeader = False
-        offset = board.GetAuxOrigin()
+        offset = design_settings.m_AuxOrigin
         # False to generate 2 separate drill files (one for plated holes, one for non plated holes)
         # True to generate only one drill file
         mergeNPTH = False
@@ -197,11 +198,11 @@ class Create_Output( pcbnew.ActionPlugin ):
         pctl.SetLayer(pcbnew.Edge_Cuts)
         pctl.PlotLayer()
 
-        popt.SetPlotMode(pcbnew.NO_FILL)     
+        popt.SetPlotMode(pcbnew.SKETCH)     
         pctl.SetLayer(pcbnew.F_Mask)
         pctl.PlotLayer()
 
-        popt.SetPlotMode(pcbnew.FILLED_SHAPE)
+        popt.SetPlotMode(pcbnew.FILLED)
         pctl.SetLayer(pcbnew.F_SilkS)
         pctl.PlotLayer()
         
