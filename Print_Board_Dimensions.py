@@ -90,7 +90,7 @@ class Print_Board_Dimensions ( pcbnew.ActionPlugin ):
             if (addnew):
                 pcb.Add(tt)
                 
-            design_settings.m_AuxOrigin = (pcbnew.wxPoint(min_x, min_y))
+            design_settings.m_AuxOrigin  = (pcbnew.wxPoint(min_x, min_y))
             design_settings.m_GridOrigin = (pcbnew.wxPoint(min_x, min_y))
 
 if __name__ == "__main__":

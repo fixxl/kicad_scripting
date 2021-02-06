@@ -105,7 +105,7 @@ class font( pcbnew.ActionPlugin ):
         
         if (frame.perform_changes):
             # Text widths
-            mods = pcb.GetModules()     
+            mods = pcb.GetFootprints()     
             for m in mods:
                 if frame.tw > 0:
                     m.Reference().SetTextWidth(pcbnew.FromMM(frame.tw))
@@ -119,7 +119,7 @@ class font( pcbnew.ActionPlugin ):
                 ang = m.Reference().GetTextAngle()
                 
                 for drawing in m.GraphicalItems():
-                    if isinstance(drawing,pcbnew.TEXTE_MODULE) and frame.t4.GetValue(): 
+                    if isinstance(drawing,pcbnew.PCB_TEXT) and frame.t4.GetValue(): 
                         if (drawing.GetText()=="${REFERENCE}"):
                             drawing.SetTextWidth(pcbnew.FromMM(frame.tw))
                             drawing.SetTextHeight(pcbnew.FromMM(frame.th))
