@@ -102,7 +102,7 @@ class Make_BOM( pcbnew.ActionPlugin ):
             reftype = []
             partsinpcb = []
             
-            mods = pcb.GetModules()
+            mods = pcb.GetFootprints()
             
             for m in mods:
                 if((str(m.GetFPID().GetUniStringLibItemName()[0:12]) != "MountingHole") and (str(m.GetFPID().GetUniStringLibItemName()[0:9]) != "TestPoint")):
@@ -143,11 +143,11 @@ class Make_BOM( pcbnew.ActionPlugin ):
             for typus in reftype:
                 newgroup = 1
                 for i in range(0, 500):
-                    if (isinstance(pcb.FindModuleByReference(typus + str(i)), pcbnew.MODULE)):
+                    if (isinstance(pcb.FindFootprintByReference(typus + str(i)), pcbnew.FOOTPRINT)):
                         if newgroup == 1:
                             newgroup = 2
                             filecontent.append(typus + " & & \\\\*" if latexbom else typus)
-                        m = pcb.FindModuleByReference(typus + str(i))
+                        m = pcb.FindFootprintByReference(typus + str(i))
                         filecontent.append("{}{}{}{}{}{}".format(FormStr(m.GetReference(), latexbom), " & " if latexbom else FillWithSpaces(len(m.GetReference()), refmaxlen), FormStr(m.GetValue(), latexbom), " & " if latexbom else FillWithSpaces(len(m.GetValue()), valmaxlen), FormStr(str(m.GetFPID().GetUniStringLibItemName()), latexbom), "\\\\" if latexbom else ""))
                         
                         partsinpcb.append(str(re.split('[0-9,\*]', m.GetReference(), 1)[0] + " " + str(m.GetFPID().GetUniStringLibItemName()) + " " + m.GetValue()))
@@ -172,8 +172,8 @@ class Make_BOM( pcbnew.ActionPlugin ):
             
             for typus in reftype:
                 for i in range(0, 500):
-                    if (isinstance(pcb.FindModuleByReference(typus + str(i)), pcbnew.MODULE)):
-                        m = pcb.FindModuleByReference(typus + str(i))                                          
+                    if (isinstance(pcb.FindFootprintByReference(typus + str(i)), pcbnew.FOOTPRINT)):
+                        m = pcb.FindFootprintByReference(typus + str(i))                                          
 
                         valpackcur = m.GetValue() + " ++++++ " + m.GetFPID().GetUniStringLibItemName()
                         
