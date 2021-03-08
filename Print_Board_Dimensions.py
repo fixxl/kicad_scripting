@@ -19,6 +19,7 @@ class Print_Board_Dimensions ( pcbnew.ActionPlugin ):
 
         # Small board outline
         pcbdrawings = pcb.GetDrawings()
+        design_settings = pcb.GetDesignSettings()
         i = 0
         for f in pcbdrawings:
             if (f.GetLayerName()=="Edge.Cuts"):
@@ -72,10 +73,10 @@ class Print_Board_Dimensions ( pcbnew.ActionPlugin ):
             dim_y = math.ceil(pcbnew.ToMM(max_y - min_y))
             
             addnew = True
-            tt = pcbnew.TEXTE_PCB(pcb)
+            tt = pcbnew.PCB_TEXT(pcb)
             
             for drawing in pcb.GetDrawings():              
-                if isinstance(drawing,pcbnew.TEXTE_PCB): 
+                if isinstance(drawing, pcbnew.PCB_TEXT): 
                     if (drawing.GetText().split(':', 1)[0]=="Board dimensions" and drawing.GetLayer() == pcbnew.Cmts_User and drawing.GetPosition()[0] == 178300000 and drawing.GetPosition()[1] == 174000000):
                         tt = drawing                   
                         addnew = False                          
@@ -89,7 +90,8 @@ class Print_Board_Dimensions ( pcbnew.ActionPlugin ):
             if (addnew):
                 pcb.Add(tt)
                 
-            pcb.SetAuxOrigin(pcbnew.wxPoint(min_x, min_y))
+            design_settings.m_AuxOrigin  = (pcbnew.wxPoint(min_x, min_y))
+            design_settings.m_GridOrigin = (pcbnew.wxPoint(min_x, min_y))
 
 if __name__ == "__main__":
     Print_Board_Dimensions().Run()
