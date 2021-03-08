@@ -84,7 +84,7 @@ class Create_Rectangular_Polygons ( pcbnew.ActionPlugin ):
 
             #----------------------------------------------------------------------
             def OnNet(self, event):
-                self.netz = pcbnew.GetBoard().GetNetsByName().find(self.t1.GetValue()).value()[1].GetNet()
+                self.netz = pcbnew.GetBoard().GetNetsByName().find(self.t1.GetValue()).value()[1].GetNetCode()
             
             def OnLayer(self, event):
                 self.layer = 3 - self.t6.GetSelection()
@@ -177,17 +177,19 @@ class Create_Rectangular_Polygons ( pcbnew.ActionPlugin ):
             i = 0
             for layer in laylst:
                 # poly = pcb.InsertArea(netz, 0, layer, poly_min_x, poly_min_y, pcbnew.ZONE_CONTAINER.DIAGONAL_EDGE)
-                poly = pcb.InsertArea(netz, i, layer, poly_min_x, poly_min_y, 2)
-                poly.SetZoneClearance(pcbnew.FromMM(clearance))
+                wp = pcbnew.wxPoint(0, 0)
+                wp.Set(poly_min_x, poly_min_y)
+                poly = pcb.AddArea(None, netz, layer, wp, 2)
+                poly.SetLocalClearance(pcbnew.FromMM(clearance))
                 poly.SetMinThickness(pcbnew.FromMM(min_thickness))
                 poly.SetThermalReliefGap(pcbnew.FromMM(thermal_gap))
-                poly.SetThermalReliefCopperBridge(pcbnew.FromMM(thermal_gap))
+                poly.SetThermalReliefSpokeWidth(pcbnew.FromMM(thermal_gap))
                 # poly.SetArcSegmentCount(32)
                 poly.SetHV45(False)
                 poly.Outline().Append(poly_max_x, poly_min_y)
                 poly.Outline().Append(poly_max_x, poly_max_y)
                 poly.Outline().Append(poly_min_x, poly_max_y)
-                poly.Hatch()
+                poly.HatchBorder()
                 i += 1
 
 if __name__ == "__main__":
