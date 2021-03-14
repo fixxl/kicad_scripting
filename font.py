@@ -119,7 +119,7 @@ class font( pcbnew.ActionPlugin ):
                 ang = m.Reference().GetTextAngle()
                 
                 for drawing in m.GraphicalItems():
-                    if isinstance(drawing,pcbnew.PCB_TEXT) and frame.t4.GetValue(): 
+                    if isinstance(drawing,pcbnew.FP_TEXT) and frame.t4.GetValue(): 
                         if (drawing.GetText()=="${REFERENCE}"):
                             drawing.SetTextWidth(pcbnew.FromMM(frame.tw))
                             drawing.SetTextHeight(pcbnew.FromMM(frame.th))

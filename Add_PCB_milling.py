@@ -36,8 +36,8 @@ class Add_PCB_milling( pcbnew.ActionPlugin ):
                 wx.Dialog.__init__(self, parent, id=-1, title="Add milling")#
                 
                 self.perform_changes = False
-                self.center_x = pcbnew.ToMM(pcbnew.GetBoard().GetGridOrigin()[0])
-                self.center_y = pcbnew.ToMM(pcbnew.GetBoard().GetGridOrigin()[1])
+                self.center_x = pcbnew.ToMM(pcbnew.GetBoard().GetDesignSettings().m_GridOrigin[0])
+                self.center_y = pcbnew.ToMM(pcbnew.GetBoard().GetDesignSettings().m_GridOrigin[1])
                 self.length_x = 0
                 self.length_y = 0
                 self.radius = 0
@@ -100,10 +100,10 @@ class Add_PCB_milling( pcbnew.ActionPlugin ):
 
             #----------------------------------------------------------------------
             def OnKeyTyped1(self, event):
-                self.center_x = self.retanum(self.t1.GetValue(), pcbnew.ToMM(pcbnew.GetBoard().GetGridOrigin()[0]))
+                self.center_x = self.retanum(self.t1.GetValue(), pcbnew.ToMM(pcbnew.GetBoard().GetDesignSettings().m_GridOrigin[0]))
                 
             def OnKeyTyped2(self, event): 
-                self.center_y = self.retanum(self.t2.GetValue(), pcbnew.ToMM(pcbnew.GetBoard().GetGridOrigin()[1]))
+                self.center_y = self.retanum(self.t2.GetValue(), pcbnew.ToMM(pcbnew.GetBoard().GetDesignSettings().m_GridOrigin[1]))
             
             def OnKeyTyped3(self, event): 
                 self.length_x = self.retanum(self.t3.GetValue())  
@@ -154,7 +154,7 @@ class Add_PCB_milling( pcbnew.ActionPlugin ):
         
         if frame.perform_changes and (radius <= length_x/2) and (radius <= length_y/2):
             if (radius == length_x/2) and (length_x == length_y):
-                circ = pcbnew.DRAWSEGMENT()
+                circ = pcbnew.PCB_SHAPE()
                 circ.SetLayer(pcbnew.Edge_Cuts)
                 circ.SetShape(pcbnew.S_CIRCLE)
                 circ.SetArcStart(pcbnew.wxPoint(center_x + radius, center_y))
@@ -167,14 +167,14 @@ class Add_PCB_milling( pcbnew.ActionPlugin ):
                 
                 # Draw straight segments
                 if(length_x > 2*radius):
-                    south = pcbnew.DRAWSEGMENT()
+                    south = pcbnew.PCB_SHAPE()
                     south.SetLayer( pcbnew.Edge_Cuts )
                     south.SetStart( pcbnew.wxPoint((center_x - length_x/2 + radius - offset * radius), (center_y + length_y/2)) )
                     south.SetEnd( pcbnew.wxPoint(center_x + length_x/2 - radius +  offset * radius, center_y + length_y/2)  )
                     south.SetWidth(width)
                     pcb.Add( south )
 
-                    north = pcbnew.DRAWSEGMENT()
+                    north = pcbnew.PCB_SHAPE()
                     north.SetLayer( pcbnew.Edge_Cuts )
                     north.SetStart( pcbnew.wxPoint((center_x - length_x/2 + radius - offset * radius), (center_y - length_y/2)) )
                     north.SetEnd( pcbnew.wxPoint(center_x + length_x/2 - radius + offset * radius, center_y - length_y/2)  )
@@ -182,14 +182,14 @@ class Add_PCB_milling( pcbnew.ActionPlugin ):
                     pcb.Add( north )
                 
                 if(length_y > 2*radius):
-                    east = pcbnew.DRAWSEGMENT()
+                    east = pcbnew.PCB_SHAPE()
                     east.SetLayer( pcbnew.Edge_Cuts )
                     east.SetStart( pcbnew.wxPoint(center_x + length_x/2, center_y - length_y/2 + radius - offset*radius) )
                     east.SetEnd( pcbnew.wxPoint(center_x + length_x/2, center_y + length_y/2 - radius + offset*radius)  )
                     east.SetWidth(width)
                     pcb.Add( east )
 
-                    west = pcbnew.DRAWSEGMENT()
+                    west = pcbnew.PCB_SHAPE()
                     west.SetLayer( pcbnew.Edge_Cuts )
                     west.SetStart( pcbnew.wxPoint(center_x - length_x/2, center_y - length_y/2 + radius - offset * radius) )
                     west.SetEnd( pcbnew.wxPoint(center_x - length_x/2, center_y + length_y/2 - radius + offset * radius)  )
@@ -199,7 +199,7 @@ class Add_PCB_milling( pcbnew.ActionPlugin ):
                 # Draw quarter circles
                 if (radius > 0):
                     if not frame.corner_outside:
-                        southeast = pcbnew.DRAWSEGMENT()
+                        southeast = pcbnew.PCB_SHAPE()
                         southeast.SetLayer( pcbnew.Edge_Cuts )
                         southeast.SetShape (pcbnew.S_ARC)
                         southeast.SetArcStart( pcbnew.wxPoint(center_x + length_x/2 - radius, center_y + length_y/2) )
@@ -208,7 +208,7 @@ class Add_PCB_milling( pcbnew.ActionPlugin ):
                         southeast.SetWidth(width)
                         pcb.Add( southeast )
 
-                        northeast = pcbnew.DRAWSEGMENT()
+                        northeast = pcbnew.PCB_SHAPE()
                         northeast.SetLayer( pcbnew.Edge_Cuts )
                         northeast.SetShape (pcbnew.S_ARC)
                         northeast.SetArcStart( pcbnew.wxPoint(center_x + length_x/2, center_y - length_y/2 + radius) )
@@ -217,7 +217,7 @@ class Add_PCB_milling( pcbnew.ActionPlugin ):
                         northeast.SetWidth(width)
                         pcb.Add( northeast )
 
-                        northwest = pcbnew.DRAWSEGMENT()
+                        northwest = pcbnew.PCB_SHAPE()
                         northwest.SetLayer( pcbnew.Edge_Cuts )
                         northwest.SetShape (pcbnew.S_ARC)
                         northwest.SetArcStart( pcbnew.wxPoint(center_x - length_x/2 + radius, center_y - length_y/2) )
@@ -226,7 +226,7 @@ class Add_PCB_milling( pcbnew.ActionPlugin ):
                         northwest.SetWidth(width)
                         pcb.Add( northwest )
 
-                        southwest = pcbnew.DRAWSEGMENT()
+                        southwest = pcbnew.PCB_SHAPE()
                         southwest.SetLayer( pcbnew.Edge_Cuts )
                         southwest.SetShape (pcbnew.S_ARC)
                         southwest.SetArcStart( pcbnew.wxPoint(center_x - length_x/2, center_y + length_y/2 - radius) )
@@ -238,7 +238,7 @@ class Add_PCB_milling( pcbnew.ActionPlugin ):
                     else:
                         factor = (1 - math.sqrt(2)/2)
                     
-                        southeast = pcbnew.DRAWSEGMENT()
+                        southeast = pcbnew.PCB_SHAPE()
                         southeast.SetLayer( pcbnew.Edge_Cuts )
                         southeast.SetShape (pcbnew.S_ARC)
                         southeast.SetArcStart( pcbnew.wxPoint(center_x + length_x/2 - radius + offset*radius, center_y + length_y/2) )
@@ -247,7 +247,7 @@ class Add_PCB_milling( pcbnew.ActionPlugin ):
                         southeast.SetWidth(width)
                         pcb.Add( southeast )
 
-                        northeast = pcbnew.DRAWSEGMENT()
+                        northeast = pcbnew.PCB_SHAPE()
                         northeast.SetLayer( pcbnew.Edge_Cuts )
                         northeast.SetShape (pcbnew.S_ARC)
                         northeast.SetArcStart( pcbnew.wxPoint(center_x + length_x/2, center_y - length_y/2 + radius - offset * radius) )
@@ -256,7 +256,7 @@ class Add_PCB_milling( pcbnew.ActionPlugin ):
                         northeast.SetWidth(width)
                         pcb.Add( northeast )
 
-                        northwest = pcbnew.DRAWSEGMENT()
+                        northwest = pcbnew.PCB_SHAPE()
                         northwest.SetLayer( pcbnew.Edge_Cuts )
                         northwest.SetShape (pcbnew.S_ARC)
                         northwest.SetArcStart( pcbnew.wxPoint(center_x - length_x/2 + radius - offset * radius, center_y - length_y/2) )
@@ -265,7 +265,7 @@ class Add_PCB_milling( pcbnew.ActionPlugin ):
                         northwest.SetWidth(width)
                         pcb.Add( northwest )
 
-                        southwest = pcbnew.DRAWSEGMENT()
+                        southwest = pcbnew.PCB_SHAPE()
                         southwest.SetLayer( pcbnew.Edge_Cuts )
                         southwest.SetShape (pcbnew.S_ARC)
                         southwest.SetArcStart( pcbnew.wxPoint(center_x - length_x/2, center_y + length_y/2 - radius + offset * radius) )
